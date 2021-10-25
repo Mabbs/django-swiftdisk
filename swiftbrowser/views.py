@@ -7,6 +7,8 @@ from hashlib import sha1
 from urllib.parse import urlparse
 
 from swiftclient import client
+from keystoneauth1 import session
+from keystoneauth1.identity import v3
 
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -14,13 +16,15 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.urls import reverse
 
-from swiftbrowser.forms import CreateContainerForm, PseudoFolderForm, \
-    LoginForm, AddACLForm
-from swiftbrowser.utils import replace_hyphens, prefix_list, \
-    pseudofolder_object_list, get_temp_key, get_base_url, get_temp_url
+from swiftbrowser.forms import CreateContainerForm, PseudoFolderForm, LoginForm, AddACLForm
+from swiftbrowser.utils import replace_hyphens, prefix_list, pseudofolder_object_list, get_temp_key, get_base_url, get_temp_url
 
 import swiftbrowser
 
+OS_USER_DOMAIN_NAME = 'Default'
+OS_PROJECT_NAME = 'admin'
+OS_PROJECT_DOMAIN_NAME = 'Default'
+OS_AUTH_URL = 'http://controller:35357/v3'
 
 def login(request):
     """ Tries to login user and sets session data """
@@ -30,17 +34,21 @@ def login(request):
         username = form.cleaned_data['username']
         password = form.cleaned_data['password']
         try:
-            auth_version = settings.SWIFT_AUTH_VERSION or 1
-            (storage_url, auth_token) = client.get_auth(
-                settings.SWIFT_AUTH_URL, username, password,
-                auth_version=auth_version)
-            request.session['auth_token'] = auth_token
-            request.session['storage_url'] = storage_url
+            auth = v3.Password(auth_url=OS_AUTH_URL,
+                   username=username,
+                   password=password,
+                   user_domain_name=OS_USER_DOMAIN_NAME,
+                   project_name=OS_PROJECT_NAME,
+                   project_domain_name=OS_PROJECT_DOMAIN_NAME)
+            keystone_session = session.Session(auth=auth)
+            swift_conn = client.Connection(session=keystone_session)
+            request.session['auth_token'] = swift_conn.get_auth()[1]
+            request.session['storage_url'] = swift_conn.get_auth()[0]
             request.session['username'] = username
             return redirect(containerview)
 
-        except client.ClientException:
-            messages.add_message(request, messages.ERROR, _("Login failed."))
+        except Exception as err:
+            messages.add_message(request, messages.ERROR, _("登录失败:{0}".format(err)))
 
     return render(request, 'login.html', {'form': form, })
 

@@ -1,9 +1,10 @@
 """ Settings for Django project """
 import os
 
-DEBUG = os.environ.get("DEBUG", False)
+DEBUG = os.environ.get("DEBUG", True)
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
+SECRET_KEY = 'django-insecure-^pzewjr!@)%f0ju0z863#%(!9$9vf^wzii1*q@&92d1+k^w+%q'
 
 USE_L10N = True
 USE_TZ = True
@@ -58,14 +59,22 @@ TEMPLATES = [
 ]
 
 SWIFT_AUTH_URL = os.environ.get(
-    'SWIFT_AUTH_URL', 'http://127.0.0.1:8080/auth/v1.0')
-SWIFT_AUTH_VERSION = os.environ.get('SWIFT_AUTH_VERSION', 1)  # 2 for keystone
-STORAGE_URL = os.environ.get('STORAGE_URL', 'http://127.0.0.1:8080/v1/')
+    'SWIFT_AUTH_URL', 'http://controller:8080/auth/v1.0')
+SWIFT_AUTH_VERSION = os.environ.get('SWIFT_AUTH_VERSION', 2)  # 2 for keystone
+STORAGE_URL = os.environ.get('STORAGE_URL', 'http://controller:8080/v1/')
 BASE_URL = os.environ.get('BASE_URL', 'http://127.0.0.1:8000')
 
-TIME_ZONE = 'Europe/Berlin'
-LANGUAGE_CODE = 'de-de'
-SECRET_KEY = os.environ.get("SECRET_KEY")
-STATIC_URL = "http://cdnjs.cloudflare.com/ajax/libs/"
+LANGUAGE_CODE = 'zh-hans'
+
+TIME_ZONE = 'Asia/Shanghai'
+
+USE_I18N = True
+
+USE_L10N = True
+
+USE_TZ = False
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS=[os.path.join(PROJECT_PATH, 'static')]
 
 ALLOWED_HOSTS = [os.environ.get("ALLOWED_HOSTS", "127.0.0.1"), ]
