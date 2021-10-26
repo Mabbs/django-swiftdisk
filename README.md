@@ -1,4 +1,4 @@
-django-swiftbrowser
+django-swiftdisk
 ===================
 
 1. 使用Django和Twitter Bootstrap搭建的基于Openstack Swift的云盘系统    
