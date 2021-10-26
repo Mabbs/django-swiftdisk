@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load l10n %}
+{% load dateconv %}
+{% load lastpart %}
+{% block content %}
+
+<div class="container">
+{% include "messages.html" %}
+
+        <ul class="breadcrumb">
+            <li><a href="{% url "containerview" %}">容器</a></li> 
+            <li><span class="divider">/</span>
+                <a class="u" href="{% url "objectview" container=container %}">{{container}}</a></li>
+
+            {% for prefix in prefixes %}
+                <li>
+                    <span class="divider">/</span>
+                    <a href="{% url "objectview" container=container prefix=prefix.full_name %}">{{prefix.display_name}}</a>
+                </li>
+            {% endfor %}
+       </ul> 
+
+<form method="POST" class="form-horizontal">
+    <fieldset>
+    <legend>创建新文件夹</legend>
+    {% csrf_token %}
+  
+    <div class="control-group">
+        <label class="control-label" for="foldername">文件夹名</label>
+        <div class="controls">
+            <input id="foldername" name="foldername" class="input-xlarge" type="text" placeholder="文件夹名">
+            <span class="help-block">
+                请在此输入文件夹名<br>
+                请注意，您在创建后不能对此文件夹重命名
+            </span>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <div class="controls">
+            <button type="submit" class="btn btn-primary">创建</button>
+            {% if prefix %}
+        <a href="{% url "objectview" container=container prefix=prefix %}" class="btn" >
+    {% else %}
+        <a href="{% url "objectview" container=container %}" class="btn" >
+    {% endif %}
+    取消</a>
+         </div>
+    </div>
+  </fieldset>
+</form>
+</div>
+
+{% endblock %}

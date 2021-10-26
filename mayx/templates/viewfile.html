@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load l10n %}
+{% load dateconv %}
+{% load lastpart %}
+{% block content %}
+
+<div class="container">
+{% include "messages.html" %}
+
+        <ul class="breadcrumb">
+            <li><a href="{% url "containerview" %}">容器</a></li> 
+            <li><span class="divider">/</span>
+                <a class="u" href="{% url "objectview" container=container %}">{{container}}</a></li>
+
+            {% for prefix in prefixes %}
+                <li>
+                    <span class="divider">/</span>
+                    <a href="{% url "objectview" container=container prefix=prefix.full_name %}">{{prefix.display_name}}</a>
+                </li>
+            {% endfor %}
+       </ul> 
+
+    <fieldset>
+    <legend>预览 {{container}}/{{objectname}}</legend>
+    <p><center>
+	{% if filetype == "image" %}
+		<img src="{{url}}" />
+	{% elif filetype == "audio" %}
+		<audio controls>
+			<source src="{{url}}" />
+			你的浏览器不支持播放此格式音频
+		</audio>
+	{% elif filetype == "video" %}
+		<video controls>
+			<source src="{{url}}" />
+			你的浏览器不支持播放此格式视频
+		</video>
+	{% else %}
+		看起来不像能预览的样子，但是可以<a href="{{url}}">下载</a>。
+	{% endif %}
+	
+	
+	</center></p>
+
+
+    {% if prefix %}
+        <a href="{% url "objectview" container=container prefix=prefix %}" class="btn" >
+    {% else %}
+        <a href="{% url "objectview" container=container %}" class="btn" >
+    {% endif %}
+    返回</a>
+  </fieldset>
+</div>
+
+{% endblock %}
+
+
+

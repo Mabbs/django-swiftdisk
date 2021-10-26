@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% load l10n %}
+{% load dateconv %}
+{% load lastpart %}
+{% load canview %}
+{% block content %}
+
+<div class="container">
+{% include "messages.html" %}
+
+        <ul class="breadcrumb">
+            <li><a href="{% url "containerview" %}">容器</a></li> 
+            <li><span class="divider">/</span>
+                <a class="u" href="{% url "objectview" container=container %}">{{container}}</a></li>
+
+            {% for prefix in prefixes %}
+                <li>
+                    <span class="divider">/</span>
+                    <a href="{% url "objectview" container=container prefix=prefix.full_name %}">{{prefix.display_name}}</a>
+                </li>
+            {% endfor %}
+
+       </ul> 
+    {% if public %}
+            
+        <div class="alert alert-info">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <strong>公开链接：</strong>
+            <a href="{{ base_url }}{% url "public_objectview" account=account container=container %}" target="new">
+                {{ base_url }}{% url "public_objectview" account=account container=container %}
+            </a>
+        </div>
+ 
+    {% endif %}
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th style="width: 0.5em;" class="hidden-phone"></th>
+            <th>名称</th>
+			<th>类型</th>
+            <th style="width: 12.5em;" class="hidden-phone">创建时间</th>
+            <th style="width: 6em;" class="hidden-phone">大小</th>
+            <th style="width: 1em;">
+                <div class="dropdown pull-right">
+                <a class="dropdown-toggle btn btn-mini btn-danger" data-toggle="dropdown">
+                    <i class="icon-plus icon-white"></i>
+                </a>
+                <ul class="dropdown-menu">
+                    <li>
+                        {% if prefix %}
+                        <a href="{% url "upload" container=container prefix=prefix %}">
+                        {% else %}
+                        <a href="{% url "upload" container=container %}">
+                        {% endif %}
+                        <i class="icon-upload"></i> 上传
+                        </a>
+                    </li>
+                    <li class="divider" />
+                    <li>
+                        {% if prefix %}
+                        <a href="{% url "create_pseudofolder" container=container prefix=prefix %}">
+                        {% else %}
+                        <a href="{% url "create_pseudofolder" container=container %}">
+                        {% endif %}
+                        <i class="icon-folder-open"></i> 创建文件夹
+                        </a>
+                    </li>
+                </ul>
+                </div>
+            </th>
+        </tr>
+        </thead>
+        {% if folders or objects %} 
+        <tbody>
+        {% for folder in folders %}
+            <tr>
+                <td class="hidden-phone"><i class="icon-inbox"></i></td>
+                <td> 
+                    <a href="{% url "objectview" container=container prefix=folder.0 %}"><strong>{{folder.0|lastpart}}</strong></a>
+                </td>
+				<td class="hidden-phone"></td>
+                <td class="hidden-phone"></td>
+                <td class="hidden-phone"></td>
+
+                    <td>
+                    <a href="{% url "delete_object" container=container objectname=folder.1 %}" class="btn btn-mini btn-danger" onclick="return confirm('确认要删除文件夹 {{folder.1|lastpart}} 吗？');" ><i class="icon-trash icon-white"></i></a>
+                    </td>
+            </tr>
+        {% endfor %}
+
+        {% for key in objects %}
+            <tr>
+                <td class="hidden-phone"><i class="icon-file"></i></td>
+                <td><a href="{% url "download" container=container objectname=key.name %}" class="block">{{key.name|lastpart}}</a></td>
+				<td class="hidden-phone">{{key.content_type}}</td>
+                <td class="hidden-phone">{{key.last_modified|dateconv|date:"SHORT_DATETIME_FORMAT"}}</td>
+	            <td class="hidden-phone">{{key.bytes|filesizeformat}}</td>
+                    <td>
+                    <div class="dropdown pull-right">
+                        <a class="dropdown-toggle btn btn-mini btn-danger" data-toggle="dropdown"><i class="icon-chevron-down icon-white"></i></a>
+                        <ul class="dropdown-menu">
+							{% if key.content_type|canview %} 
+							<li><a href="{% url "viewfile" container=container objectname=key.name %}"><i class="icon-eye-open"></i> 预览</a></li>
+							{% endif %}
+                            <li><a href="{% url "tempurl" container=container objectname=key.name %}"><i class="icon-time"></i> 分享链接</a></li>
+                            <li class="divider" />
+                            <li><a href="{% url "delete_object" container=container objectname=key.name  %}" onclick="return confirm('确认要删除对象 {{key.name}} 吗？');" ><i class="icon-trash"></i> 删除对象</a></li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+
+        {% endfor %}
+        </tbody> 
+        {% else %}
+        <tbody>
+            <tr>
+                <th colspan="6" class="center">
+                    <strong><center>这个容器还没有对象，点击红色按钮上传新对象<center></strong>
+                </th>
+            </tr>
+        </tbody>
+        {% endif %}
+        <tfoot><tr><td colspan="6"></td></tr></tfoot>
+    </table>
+</div>
+{% endblock %}
+    {% block jsadd %} <script type="text/javascript"> $('input[id=file]').change(function() { $('#filetmp').val($(this).val()); }); </script> {% endblock %}
+
