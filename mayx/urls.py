@@ -1,32 +1,32 @@
 from django.conf.urls import url
-from mayx.views import containerview, objectview, download,\
-    delete_object, login, reg, tempurl, upload, create_pseudofolder,\
-    create_container, delete_container, public_objectview, toggle_public,\
-    edit_acl, viewfile
+from mayx import views
 
 urlpatterns = (
-    url(r'^login/$', login, name="login"),
-    url(r'^reg/$', reg, name="reg"),
-    url(r'^$', containerview, name="containerview"),
+    url(r'^login/$', views.login, name="login"),
+    url(r'^reg/$', views.reg, name="reg"),
+    url(r'^$', views.containerview, name="containerview"),
     url(r'^public/(?P<account>.+?)/(?P<container>.+?)/(?P<prefix>(.+)+)?$',
-        public_objectview, name="public_objectview"),
-    url(r'^toggle_public/(?P<container>.+?)/$', toggle_public,
+        views.public_objectview, name="public_objectview"),
+    url(r'^toggle_public/(?P<container>.+?)/$', views.toggle_public,
         name="toggle_public"),
-    url(r'^tempurl/(?P<container>.+?)/(?P<objectname>.+?)$', tempurl,
+    url(r'^tempurl/(?P<container>.+?)/(?P<objectname>.+?)$', views.tempurl,
         name="tempurl"),
-    url(r'^viewfile/(?P<container>.+?)/(?P<objectname>.+?)$', viewfile,
+    url(r'^viewfile/(?P<container>.+?)/(?P<objectname>.+?)$', views.viewfile,
         name="viewfile"),
-    url(r'^upload/(?P<container>.+?)/(?P<prefix>.+)?$', upload, name="upload"),
+    url(r'^copysource/(?P<container>.+?)/(?P<objectname>.+?)$', views.copysource,
+        name="copysource"),
+    url(r'^upload/(?P<container>.+?)/(?P<prefix>.+)?$', views.upload, name="upload"),
+    url(r'^copydest/(?P<container>.+?)/(?P<prefix>.+)?$', views.copydest, name="copydest"),
     url(r'^create_pseudofolder/(?P<container>.+?)/(?P<prefix>.+)?$',
-        create_pseudofolder, name="create_pseudofolder"),
-    url(r'^create_container$', create_container, name="create_container"),
-    url(r'^delete_container/(?P<container>.+?)$', delete_container,
+        views.create_pseudofolder, name="create_pseudofolder"),
+    url(r'^create_container$', views.create_container, name="create_container"),
+    url(r'^delete_container/(?P<container>.+?)$', views.delete_container,
         name="delete_container"),
-    url(r'^download/(?P<container>.+?)/(?P<objectname>.+?)$', download,
+    url(r'^download/(?P<container>.+?)/(?P<objectname>.+?)$', views.download,
         name="download"),
-    url(r'^delete/(?P<container>.+?)/(?P<objectname>.+?)$', delete_object,
+    url(r'^delete/(?P<container>.+?)/(?P<objectname>.+?)$', views.delete_object,
         name="delete_object"),
-    url(r'^objects/(?P<container>.+?)/(?P<prefix>(.+)+)?$', objectview,
+    url(r'^objects/(?P<container>.+?)/(?P<prefix>(.+)+)?$', views.objectview,
         name="objectview"),
-    url(r'^acls/(?P<container>.+?)/$', edit_acl, name="edit_acl"),
+    url(r'^acls/(?P<container>.+?)/$', views.edit_acl, name="edit_acl"),
 )

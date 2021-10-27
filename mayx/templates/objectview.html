@@ -54,6 +54,15 @@
                         {% endif %}
                         <i class="icon-upload"></i> 上传
                         </a>
+						{% if request.session.copy_source %}
+						{% if prefix %}
+                        <a href="{% url "copydest" container=container prefix=prefix %}">
+                        {% else %}
+                        <a href="{% url "copydest" container=container %}">
+                        {% endif %}
+                        <i class="icon-download-alt"></i> 粘贴
+                        </a>
+						{% endif %}
                     </li>
                     <li class="divider" />
                     <li>
@@ -102,6 +111,7 @@
 							{% if key.content_type|canview %} 
 							<li><a href="{% url "viewfile" container=container objectname=key.name %}"><i class="icon-eye-open"></i> 预览</a></li>
 							{% endif %}
+							<li><a href="{% url "copysource" container=container objectname=key.name %}"><i class="icon-file"></i> 复制</a></li>
                             <li><a href="{% url "tempurl" container=container objectname=key.name %}"><i class="icon-time"></i> 分享链接</a></li>
                             <li class="divider" />
                             <li><a href="{% url "delete_object" container=container objectname=key.name  %}" onclick="return confirm('确认要删除对象 {{key.name}} 吗？');" ><i class="icon-trash"></i> 删除对象</a></li>

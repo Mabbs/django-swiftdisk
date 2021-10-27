@@ -104,6 +104,9 @@ def containerview(request):
             messages.add_message(request, messages.ERROR, "没有列出权限")
         else:
             return redirect(login)
+    except Exception as exc:
+        messages.add_message(request, messages.ERROR, exc)
+        return redirect(login)
 
     account_stat = replace_hyphens(account_stat)
 
@@ -533,3 +536,36 @@ def edit_acl(request, container):
         'acls': acls,
         'public': public,
         'base_url': base_url})
+        
+def copysource(request, container, objectname):
+    """ 复制文件 - 源 """
+    request.session['copy_source'] = container + "/" + objectname
+    messages.add_message(request, messages.INFO, "复制成功！请在目标位置点击红色按钮中的粘贴")
+    prefix = '/'.join(objectname.split('/')[:-1])
+    if prefix:
+        prefix += '/'
+    return redirect(objectview, container=container, prefix=prefix)
+    
+def copydest(request, container, prefix=None):
+    """ 粘贴文件 - 目标 """
+    
+    storage_url = request.session.get('storage_url', '')
+    auth_token = request.session.get('auth_token', '')
+    
+    dcontainer, dname = request.session.get('copy_source', '/').split("/",1)
+    
+    if prefix:
+        destination = container + "/" + prefix + dname.split('/')[-1]
+    else:
+        destination = container + "/" + dname.split('/')[-1]
+    print(destination)
+    del request.session['copy_source']
+    try:
+        client.copy_object(storage_url, auth_token, container=dcontainer, name=dname, destination=destination)
+        messages.add_message(request, messages.INFO, "粘贴成功！")
+    except client.ClientException:
+        messages.add_message(request, messages.ERROR, "粘贴失败")
+    if prefix:
+        return redirect(objectview, container=container, prefix=prefix)
+    else:
+        return redirect(objectview, container=container)
