@@ -17,7 +17,6 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.conf import settings
 from django.urls import reverse
-from django.http import HttpResponse
 
 from mayx.forms import CreateContainerForm, PseudoFolderForm, LoginForm, AddACLForm
 from mayx.utils import replace_hyphens, prefix_list, pseudofolder_object_list, get_temp_key, get_base_url, get_temp_url
@@ -107,7 +106,6 @@ def containerview(request):
             return redirect(login)
 
     account_stat = replace_hyphens(account_stat)
-    print(containers)
 
     return render(request, 'containerview.html', {
         'account_stat': account_stat,

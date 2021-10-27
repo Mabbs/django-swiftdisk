@@ -6,9 +6,6 @@ DEBUG = os.environ.get("DEBUG", True)
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 SECRET_KEY = 'django-insecure-^pzewjr!@)%f0ju0z863#%(!9$9vf^wzii1*q@&92d1+k^w+%q'
 
-USE_L10N = True
-USE_TZ = True
-
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
