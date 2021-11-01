@@ -540,7 +540,18 @@ def edit_acl(request, container):
 def copysource(request, container, objectname):
     """ 复制文件 - 源 """
     request.session['copy_source'] = container + "/" + objectname
+    request.session['copy_type'] = 0
     messages.add_message(request, messages.INFO, "复制成功！请在目标位置点击红色按钮中的粘贴")
+    prefix = '/'.join(objectname.split('/')[:-1])
+    if prefix:
+        prefix += '/'
+    return redirect(objectview, container=container, prefix=prefix)
+    
+def movesource(request, container, objectname):
+    """ 剪切文件 - 源 """
+    request.session['copy_source'] = container + "/" + objectname
+    request.session['copy_type'] = 1
+    messages.add_message(request, messages.INFO, "剪切成功！请在目标位置点击红色按钮中的粘贴")
     prefix = '/'.join(objectname.split('/')[:-1])
     if prefix:
         prefix += '/'
@@ -559,12 +570,16 @@ def copydest(request, container, prefix=None):
     else:
         destination = container + "/" + dname.split('/')[-1]
     print(destination)
-    del request.session['copy_source']
+    
     try:
         client.copy_object(storage_url, auth_token, container=dcontainer, name=dname, destination=destination)
+        if request.session.get('copy_type', '0') == 1:
+            client.delete_object(storage_url, auth_token, container=dcontainer, name=dname)
         messages.add_message(request, messages.INFO, "粘贴成功！")
     except client.ClientException:
         messages.add_message(request, messages.ERROR, "粘贴失败")
+    del request.session['copy_source']
+    del request.session['copy_type']
     if prefix:
         return redirect(objectview, container=container, prefix=prefix)
     else:

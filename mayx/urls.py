@@ -15,6 +15,8 @@ urlpatterns = (
         name="viewfile"),
     url(r'^copysource/(?P<container>.+?)/(?P<objectname>.+?)$', views.copysource,
         name="copysource"),
+    url(r'^movesource/(?P<container>.+?)/(?P<objectname>.+?)$', views.movesource,
+        name="movesource"),
     url(r'^upload/(?P<container>.+?)/(?P<prefix>.+)?$', views.upload, name="upload"),
     url(r'^copydest/(?P<container>.+?)/(?P<prefix>.+)?$', views.copydest, name="copydest"),
     url(r'^create_pseudofolder/(?P<container>.+?)/(?P<prefix>.+)?$',
