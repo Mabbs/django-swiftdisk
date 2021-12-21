@@ -35,6 +35,8 @@
 			<source src="{{url}}" />
 			你的浏览器不支持播放此格式视频
 		</video>
+	{% elif filetype == "text" %}
+		<textarea style="width: 1000px; height: 400px;">{{content}}</textarea>
 	{% else %}
 		看起来不像能预览的样子，但是可以<a href="{{url}}">下载</a>。
 	{% endif %}

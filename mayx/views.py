@@ -363,14 +363,22 @@ def viewfile(request, container, objectname):
     storage_url = request.session.get('storage_url', '')
     auth_token = request.session.get('auth_token', '')
 
-    url = get_temp_url(storage_url, auth_token,
-                       container, objectname, 3600)
-    filetype = client.head_object(storage_url, auth_token,
+    url = ""
+    content = ""
+    try:
+        filetype = client.head_object(storage_url, auth_token,
                        container, objectname)['content-type'].split("/")[0]
-
-    if not url:
+    except client.ClientException:
         messages.add_message(request, messages.ERROR, "拒绝访问")
         return redirect(objectview, container=container)
+        
+    if filetype == "text":
+        header, content = client.get_object(storage_url, auth_token,
+                       container, objectname)
+        content = content.decode('utf-8')
+    else:
+        url = get_temp_url(storage_url, auth_token,
+                       container, objectname, 3600)
 
     prefix = '/'.join(objectname.split('/')[:-1])
     if prefix:
@@ -379,6 +387,7 @@ def viewfile(request, container, objectname):
 
     return render(request, 'viewfile.html', {
         'filetype': filetype,
+        'content': content,
         'url': url,
         'account': storage_url.split('/')[-1],
         'container': container,
